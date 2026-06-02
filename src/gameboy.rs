@@ -120,7 +120,7 @@ impl<T: Mbc>  GameBoy<T> {
 
     pub fn run_frame(&mut self, key_input: &KeyInput) -> bool {
         let mut cycles_elapsed = 0;
-
+        
         self.manage_input(key_input);
         while cycles_elapsed < FRAME_CYCLES {
             // 1. Tick Timers

@@ -298,6 +298,7 @@ pub struct LaunchGameData {
     pub debug_response_sender: Sender<DebugResponse>,
     pub global_is_debug: Arc<AtomicBool>,
     pub ui_is_alive: Arc<AtomicBool>,
+    pub fps_counter: Arc<Mutex<u32>>,
 }
 
 
@@ -332,6 +333,7 @@ pub struct CoreGameDevice {
     pub actual_image: Arc<Mutex<Vec<u8>>>,
     pub sized_image: Option<SizedTexture>,
     pub global_is_debug: Arc<AtomicBool>,
+    pub fps_counter: Arc<Mutex<u32>>,
     texture_handler: Option<TextureHandle>,
     key_mapping: KeyMapping,
     ui_is_alive: Arc<AtomicBool>,
@@ -397,6 +399,7 @@ impl CoreGameDevice {
         let actual_image = Arc::new(Mutex::new(vec![0; 160 * 144 * 3]));
         let ui_is_alive = Arc::new(AtomicBool::new(false));
         let texture_handler = None;
+        let fps_counter = Arc::new(Mutex::new(0_u32));
         Self {
             input_sender,
             command_query_sender,
@@ -412,6 +415,7 @@ impl CoreGameDevice {
                     global_is_debug: global_is_debug.clone(),
                     ui_is_alive: ui_is_alive.clone(),
                     actual_image: actual_image.clone(),
+                    fps_counter: fps_counter.clone()
                 }
             )),
             texture_handler,
@@ -421,6 +425,7 @@ impl CoreGameDevice {
             sized_image: None,
             key_mapping: KeyMapping::default(),
             ui_is_alive,
+            fps_counter,
         }
     }
 }
@@ -488,4 +493,10 @@ pub struct DebuggingDevice {
 
 impl Default for AppState {
     fn default() -> Self { Self::StartingHub(Default::default()) }
+}
+
+impl LaunchGameData {
+    fn get_fps(&self) -> u32 {
+        *self.fps_counter.lock().unwrap()
+    }
 }
